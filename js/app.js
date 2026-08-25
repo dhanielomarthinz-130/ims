@@ -1,6 +1,8 @@
 /**
  * Main Application Orchestrator, Router & Auth Guard
- * Enterprise Sidebar Architecture with Role-Based Access Control
+ * Dual-Mode Architecture:
+ * - ADMIN PORTAL: Desktop Enterprise 2-Column Sidebar & Topbar
+ * - OPERATOR PORTAL: Full-screen Handheld Terminal UI (NO SIDEBAR) with Large Touch Navigation
  */
 
 import { Auth, ROLES } from './data/auth.js';
@@ -43,14 +45,12 @@ class WMSApp {
     this.currentPortal = Auth.getDefaultPortal();
     this.currentView = Auth.getDefaultView();
 
-    this.applySidebarState();
-    this.renderSidebar();
-    this.renderTopbar();
+    this.applyPortalLayout();
     this.renderCurrentView();
 
     // Subscribe to database / storage updates
     Storage.subscribe((event) => {
-      if (['PUTAWAY_COMPLETED', 'INBOUND_CREATED', 'RESET', 'SKU_UPDATED', 'LOCATION_UPDATED', 'PRODUCTS_IMPORTED'].includes(event)) {
+      if (['PUTAWAY_COMPLETED', 'INBOUND_CREATED', 'RESET', 'SKU_UPDATED', 'LOCATION_UPDATED', 'PRODUCTS_IMPORTED', 'BACKEND_SYNCED'].includes(event)) {
         if (Auth.isLoggedIn()) {
           this.renderCurrentView();
           this.updatePendingBadges();
@@ -195,27 +195,43 @@ class WMSApp {
   }
 
   onLoginSuccess(user, defaultPortal, defaultView) {
-    const layout = document.getElementById('app-layout');
-    const sidebar = document.getElementById('app-sidebar');
-    const topbar = document.getElementById('app-topbar');
-
-    if (sidebar) sidebar.style.display = 'flex';
-    if (topbar) topbar.style.display = 'flex';
-    if (layout) layout.style.display = 'flex';
-
     // Direct routing based on Operator vs Admin role
     this.currentPortal = defaultPortal;
     this.currentView = defaultView;
 
-    this.renderSidebar();
-    this.renderTopbar();
+    this.applyPortalLayout();
     this.renderCurrentView();
+  }
+
+  applyPortalLayout() {
+    const layout = document.getElementById('app-layout');
+    const sidebar = document.getElementById('app-sidebar');
+    const topbar = document.getElementById('app-topbar');
+
+    if (!Auth.isLoggedIn()) {
+      this.renderLogin();
+      return;
+    }
+
+    if (this.currentPortal === 'OPERATOR') {
+      // OPERATOR HANDHELD MODE: HIDE SIDEBAR & TOPBAR COMPLETELY
+      if (sidebar) sidebar.style.display = 'none';
+      if (topbar) topbar.style.display = 'none';
+      if (layout) layout.style.display = 'block';
+    } else {
+      // ADMIN DESKTOP MODE: SHOW SIDEBAR & TOPBAR
+      if (sidebar) sidebar.style.display = 'flex';
+      if (topbar) topbar.style.display = 'flex';
+      if (layout) layout.style.display = 'flex';
+      this.applySidebarState();
+      this.renderSidebar();
+      this.renderTopbar();
+    }
   }
 
   renderSidebar() {
     const sidebarNav = document.getElementById('app-sidebar-nav');
     const sidebarUserFooter = document.getElementById('sidebar-user-footer');
-    const portalSection = document.getElementById('sidebar-portal-section');
     const user = Auth.getCurrentUser();
 
     if (!sidebarNav || !sidebarUserFooter || !user) return;
@@ -243,93 +259,56 @@ class WMSApp {
     if (adminTab) adminTab.onclick = () => this.switchPortal('ADMIN');
     if (opTab) opTab.onclick = () => this.switchPortal('OPERATOR');
 
-    // Render Navigation Links according to Portal & Role
-    const stagingCount = Storage.getStockItems().filter((s) => s.status === 'STAGING').length;
+    // Desktop Admin Panel Navigation
+    let navHtml = `<div class="nav-group-title">Menu Utama</div>`;
 
-    let navHtml = '';
+    if (Auth.canAccessView('admin-dashboard')) {
+      navHtml += `
+        <button class="sidebar-nav-item ${this.currentView === 'admin-dashboard' ? 'active' : ''}" data-view="admin-dashboard" title="Dashboard & Tata Letak">
+          <span class="nav-item-icon"><i class="icon-layout"></i></span>
+          <span class="nav-item-text">Dashboard & Tata Letak</span>
+        </button>
+      `;
+    }
 
-    if (this.currentPortal === 'OPERATOR') {
-      navHtml += `<div class="nav-group-title">Operasional Handheld (HHT)</div>`;
+    if (Auth.canAccessView('admin-stock')) {
+      navHtml += `
+        <button class="sidebar-nav-item ${this.currentView === 'admin-stock' ? 'active' : ''}" data-view="admin-stock" title="Check Stock 12 Kolom SAP">
+          <span class="nav-item-icon"><i class="icon-grid"></i></span>
+          <span class="nav-item-text">Check Stock 12 Kolom SAP</span>
+        </button>
+      `;
+    }
 
-      if (Auth.canAccessView('operator-inbound')) {
+    if (Auth.canAccessView('admin-inbound')) {
+      navHtml += `
+        <button class="sidebar-nav-item ${this.currentView === 'admin-inbound' ? 'active' : ''}" data-view="admin-inbound" title="Dokumen Inbound (GRN)">
+          <span class="nav-item-icon"><i class="icon-file-text"></i></span>
+          <span class="nav-item-text">Dokumen Inbound (GRN)</span>
+        </button>
+      `;
+    }
+
+    const hasMaster = Auth.canAccessView('admin-master') || Auth.canAccessView('admin-users');
+    if (hasMaster) {
+      navHtml += `<div class="nav-group-title">Master Data & Pengaturan</div>`;
+
+      if (Auth.canAccessView('admin-master')) {
         navHtml += `
-          <button class="sidebar-nav-item operator-style ${this.currentView === 'operator-inbound' ? 'active' : ''}" data-view="operator-inbound" title="Inbound Staging">
-            <span class="nav-item-icon"><i class="icon-inbound"></i></span>
-            <span class="nav-item-text">Inbound Staging</span>
+          <button class="sidebar-nav-item ${this.currentView === 'admin-master' ? 'active' : ''}" data-view="admin-master" title="Master Produk & Lokasi Rak">
+            <span class="nav-item-icon"><i class="icon-database"></i></span>
+            <span class="nav-item-text">Master Produk & Rak</span>
           </button>
         `;
       }
 
-      if (Auth.canAccessView('operator-putaway')) {
+      if (Auth.canAccessView('admin-users')) {
         navHtml += `
-          <button class="sidebar-nav-item operator-style ${this.currentView === 'operator-putaway' ? 'active' : ''}" data-view="operator-putaway" title="Putaway ke Rak">
-            <span class="nav-item-icon"><i class="icon-arrow-right-circle"></i></span>
-            <span class="nav-item-text">Putaway ke Rak</span>
-            ${stagingCount > 0 ? `<span class="nav-item-badge">${stagingCount}</span>` : ''}
+          <button class="sidebar-nav-item ${this.currentView === 'admin-users' ? 'active' : ''}" data-view="admin-users" title="Manajemen User Divisi">
+            <span class="nav-item-icon"><i class="icon-user"></i></span>
+            <span class="nav-item-text">Manajemen User</span>
           </button>
         `;
-      }
-
-      if (Auth.canAccessView('operator-stock')) {
-        navHtml += `
-          <button class="sidebar-nav-item operator-style ${this.currentView === 'operator-stock' ? 'active' : ''}" data-view="operator-stock" title="Cek Stock Gudang">
-            <span class="nav-item-icon"><i class="icon-search"></i></span>
-            <span class="nav-item-text">Cek Stock Gudang</span>
-          </button>
-        `;
-      }
-    } else {
-      // Desktop Admin Panel Navigation
-      navHtml += `<div class="nav-group-title">Menu Utama</div>`;
-
-      if (Auth.canAccessView('admin-dashboard')) {
-        navHtml += `
-          <button class="sidebar-nav-item ${this.currentView === 'admin-dashboard' ? 'active' : ''}" data-view="admin-dashboard" title="Dashboard & Tata Letak">
-            <span class="nav-item-icon"><i class="icon-layout"></i></span>
-            <span class="nav-item-text">Dashboard & Tata Letak</span>
-          </button>
-        `;
-      }
-
-      if (Auth.canAccessView('admin-stock')) {
-        navHtml += `
-          <button class="sidebar-nav-item ${this.currentView === 'admin-stock' ? 'active' : ''}" data-view="admin-stock" title="Check Stock 12 Kolom SAP">
-            <span class="nav-item-icon"><i class="icon-grid"></i></span>
-            <span class="nav-item-text">Check Stock 12 Kolom SAP</span>
-          </button>
-        `;
-      }
-
-      if (Auth.canAccessView('admin-inbound')) {
-        navHtml += `
-          <button class="sidebar-nav-item ${this.currentView === 'admin-inbound' ? 'active' : ''}" data-view="admin-inbound" title="Dokumen Inbound (GRN)">
-            <span class="nav-item-icon"><i class="icon-file-text"></i></span>
-            <span class="nav-item-text">Dokumen Inbound (GRN)</span>
-          </button>
-        `;
-      }
-
-      const hasMaster = Auth.canAccessView('admin-master') || Auth.canAccessView('admin-users');
-      if (hasMaster) {
-        navHtml += `<div class="nav-group-title">Master Data & Pengaturan</div>`;
-
-        if (Auth.canAccessView('admin-master')) {
-          navHtml += `
-            <button class="sidebar-nav-item ${this.currentView === 'admin-master' ? 'active' : ''}" data-view="admin-master" title="Master Produk & Lokasi Rak">
-              <span class="nav-item-icon"><i class="icon-database"></i></span>
-              <span class="nav-item-text">Master Produk & Rak</span>
-            </button>
-          `;
-        }
-
-        if (Auth.canAccessView('admin-users')) {
-          navHtml += `
-            <button class="sidebar-nav-item ${this.currentView === 'admin-users' ? 'active' : ''}" data-view="admin-users" title="Manajemen User Divisi">
-              <span class="nav-item-icon"><i class="icon-user"></i></span>
-              <span class="nav-item-text">Manajemen User</span>
-            </button>
-          `;
-        }
       }
     }
 
@@ -379,10 +358,7 @@ class WMSApp {
         'admin-stock': 'Check Stock Gudang Besar (12 Kolom SAP)',
         'admin-inbound': 'Dokumen Inbound (GRN)',
         'admin-master': 'Master Produk & Lokasi Rak',
-        'admin-users': 'Manajemen User & Hak Akses Divisi',
-        'operator-inbound': 'Inbound Penerimaan Staging',
-        'operator-putaway': 'Putaway ke Rak Gudang',
-        'operator-stock': 'Check Stock Handheld'
+        'admin-users': 'Manajemen User & Hak Akses Divisi'
       };
       pageTitleElem.innerText = viewNames[this.currentView] || 'Overview';
     }
@@ -414,8 +390,7 @@ class WMSApp {
       this.currentView = Auth.canAccessView('operator-inbound') ? 'operator-inbound' : 'operator-stock';
     }
 
-    this.renderSidebar();
-    this.renderTopbar();
+    this.applyPortalLayout();
     this.renderCurrentView();
   }
 
@@ -436,12 +411,12 @@ class WMSApp {
     // Synchronize portal if view starts with different prefix
     if (viewId.startsWith('operator-') && this.currentPortal !== 'OPERATOR') {
       this.currentPortal = 'OPERATOR';
+      this.applyPortalLayout();
     } else if (viewId.startsWith('admin-') && this.currentPortal !== 'ADMIN') {
       this.currentPortal = 'ADMIN';
+      this.applyPortalLayout();
     }
 
-    this.renderSidebar();
-    this.renderTopbar();
     this.renderCurrentView();
   }
 
@@ -454,19 +429,139 @@ class WMSApp {
       return;
     }
 
-    switch (this.currentView) {
-      // Operator Handheld Views
-      case 'operator-inbound':
-        OperatorInbound.render(mainContainer, this.viewParams);
-        break;
-      case 'operator-putaway':
-        OperatorPutaway.render(mainContainer, this.viewParams);
-        break;
-      case 'operator-stock':
-        OperatorStock.render(mainContainer, this.viewParams);
-        break;
+    const user = Auth.getCurrentUser();
+    const roleInfo = ROLES[user.role] || { name: user.role, color: '#94a3b8' };
 
-      // Desktop Admin Views
+    // --- OPERATOR HANDHELD PORTAL (NO SIDEBAR) ---
+    if (this.currentPortal === 'OPERATOR') {
+      const stagingCount = Storage.getStockItems().filter((s) => s.status === 'STAGING').length;
+      const canAccessAdmin = Auth.canAccessPortal('ADMIN');
+
+      mainContainer.innerHTML = `
+        <div class="handheld-portal-wrapper">
+          
+          <!-- Handheld Topbar -->
+          <div class="handheld-topbar">
+            <div class="handheld-operator-info">
+              <div class="handheld-avatar">${user.avatar || '👷'}</div>
+              <div class="handheld-name-box">
+                <span class="handheld-name">${user.name}</span>
+                <span class="handheld-role-chip" style="color: ${roleInfo.color};">${roleInfo.name}</span>
+              </div>
+            </div>
+
+            <div class="handheld-top-actions">
+              <button class="btn btn-sm btn-primary" id="btn-hht-scan-trigger" title="Buka Scanner Barcode (F2)">
+                <i class="icon-camera"></i> Scan (F2)
+              </button>
+              ${canAccessAdmin ? `
+                <button class="btn btn-sm btn-outline" id="btn-hht-switch-admin" title="Kembali ke Panel Admin">
+                  🖥️ Admin Panel
+                </button>
+              ` : ''}
+              <button class="btn btn-sm btn-danger" id="btn-hht-logout" title="Keluar / Logout">
+                🚪 Logout
+              </button>
+            </div>
+          </div>
+
+          <!-- Handheld Touch Menu Tabs Grid -->
+          <div class="handheld-nav-bar">
+            ${Auth.canAccessView('operator-inbound') ? `
+              <button class="handheld-nav-btn ${this.currentView === 'operator-inbound' ? 'active' : ''}" id="tab-hht-inbound">
+                <span class="handheld-nav-icon">📥</span>
+                <span>Inbound Staging</span>
+              </button>
+            ` : ''}
+
+            ${Auth.canAccessView('operator-putaway') ? `
+              <button class="handheld-nav-btn ${this.currentView === 'operator-putaway' ? 'active' : ''}" id="tab-hht-putaway">
+                <span class="handheld-nav-icon">🚜</span>
+                <span>Putaway Rak</span>
+                ${stagingCount > 0 ? `<span class="handheld-badge">${stagingCount}</span>` : ''}
+              </button>
+            ` : ''}
+
+            ${Auth.canAccessView('operator-stock') ? `
+              <button class="handheld-nav-btn ${this.currentView === 'operator-stock' ? 'active' : ''}" id="tab-hht-stock">
+                <span class="handheld-nav-icon">🔍</span>
+                <span>Cek Stock</span>
+              </button>
+            ` : ''}
+          </div>
+
+          <!-- Active Operator View Body -->
+          <div id="handheld-view-body" class="handheld-view-body"></div>
+        </div>
+      `;
+
+      // Attach Handheld Header & Tab Events
+      const btnScan = mainContainer.querySelector('#btn-hht-scan-trigger');
+      if (btnScan) {
+        btnScan.onclick = () => {
+          QRScanner.openScannerModal({
+            title: 'Handheld Barcode / QR Scanner',
+            hint: 'Arahkan kamera ke QR Barcode Pallet atau Rak',
+            onScan: (code) => {
+              if (this.currentView === 'operator-putaway') {
+                this.navigateTo('operator-putaway', { autoScanLP: code });
+              } else {
+                this.navigateTo('operator-stock');
+              }
+            }
+          });
+        };
+      }
+
+      const btnSwitchAdmin = mainContainer.querySelector('#btn-hht-switch-admin');
+      if (btnSwitchAdmin) {
+        btnSwitchAdmin.onclick = () => this.switchPortal('ADMIN');
+      }
+
+      const btnLogout = mainContainer.querySelector('#btn-hht-logout');
+      if (btnLogout) {
+        btnLogout.onclick = () => {
+          if (confirm(`Logout dari akun ${user.name}?`)) {
+            Auth.logout();
+            SoundEngine.playScanSuccess();
+            this.renderLogin();
+          }
+        };
+      }
+
+      const tabInbound = mainContainer.querySelector('#tab-hht-inbound');
+      if (tabInbound) tabInbound.onclick = () => this.navigateTo('operator-inbound');
+
+      const tabPutaway = mainContainer.querySelector('#tab-hht-putaway');
+      if (tabPutaway) tabPutaway.onclick = () => this.navigateTo('operator-putaway');
+
+      const tabStock = mainContainer.querySelector('#tab-hht-stock');
+      if (tabStock) tabStock.onclick = () => this.navigateTo('operator-stock');
+
+      const hhtBody = mainContainer.querySelector('#handheld-view-body');
+
+      // Render Active Component into Handheld Body
+      switch (this.currentView) {
+        case 'operator-inbound':
+          OperatorInbound.render(hhtBody, this.viewParams);
+          break;
+        case 'operator-putaway':
+          OperatorPutaway.render(hhtBody, this.viewParams);
+          break;
+        case 'operator-stock':
+          OperatorStock.render(hhtBody, this.viewParams);
+          break;
+        default:
+          OperatorInbound.render(hhtBody, this.viewParams);
+      }
+      return;
+    }
+
+    // --- DESKTOP ADMIN PORTAL (WITH SIDEBAR) ---
+    this.renderSidebar();
+    this.renderTopbar();
+
+    switch (this.currentView) {
       case 'admin-dashboard':
         AdminDashboard.render(mainContainer, this.viewParams);
         break;
@@ -494,7 +589,9 @@ class WMSApp {
   }
 
   updatePendingBadges() {
-    this.renderSidebar();
+    if (this.currentPortal === 'ADMIN') {
+      this.renderSidebar();
+    }
   }
 }
 
