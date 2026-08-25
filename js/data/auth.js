@@ -1,7 +1,9 @@
 /**
- * Role-Based Access Control (RBAC) & Authentication Manager for WMS
+ * Role-Based Access Control (RBAC) & Authentication Manager for WMS (PHP & MySQL Backend Integrated)
  * Pre-configured accounts for Daniel Imsula (Super Admin) and Division Roles.
  */
+
+import { API } from './apiClient.js';
 
 const STORAGE_KEY_AUTH = 'wms_auth_session_v1';
 const STORAGE_KEY_USERS = 'wms_custom_users_v1';
@@ -157,12 +159,20 @@ class AuthManager {
     };
     users.push(newUser);
     this.saveUsers(users);
+
+    // Sync to MySQL
+    API.addUser(newUser).catch((e) => console.warn('Add user MySQL error:', e));
+
     return { success: true, user: newUser };
   }
 
   deleteUser(userId) {
     const users = this.getUsers().filter((u) => u.id !== userId);
     this.saveUsers(users);
+
+    // Sync to MySQL
+    API.deleteUser(userId).catch((e) => console.warn('Delete user MySQL error:', e));
+
     return { success: true };
   }
 
@@ -197,12 +207,17 @@ class AuthManager {
     };
 
     localStorage.setItem(STORAGE_KEY_AUTH, JSON.stringify(this.currentUser));
+
+    // Send async login to PHP backend
+    API.login(username, password).catch((e) => console.warn('Backend login log error:', e));
+
     return { success: true, user: this.currentUser };
   }
 
   logout() {
     this.currentUser = null;
     localStorage.removeItem(STORAGE_KEY_AUTH);
+    API.logout().catch((e) => console.warn('Backend logout error:', e));
   }
 
   getCurrentUser() {

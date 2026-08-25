@@ -397,16 +397,10 @@ class WMSApp {
   updateDatabaseStatus() {
     const statusDot = document.querySelector('.status-indicator-dot');
     const statusLabel = document.getElementById('lbl-supabase-status');
-    const isConfigured = SupabaseClient.isConfigured();
 
     if (statusDot && statusLabel) {
-      if (isConfigured) {
-        statusDot.className = 'status-indicator-dot dot-active';
-        statusLabel.innerText = 'Supabase Cloud: Terhubung';
-      } else {
-        statusDot.className = 'status-indicator-dot dot-local';
-        statusLabel.innerText = 'Database: Local Storage';
-      }
+      statusDot.className = 'status-indicator-dot dot-active';
+      statusLabel.innerText = 'PHP + MySQL: Terhubung';
     }
   }
 
