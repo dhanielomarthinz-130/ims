@@ -16,6 +16,7 @@ export const ROLES = {
     color: '#8b5cf6',
     allowedPortals: ['ADMIN', 'OPERATOR'],
     allowedViews: [
+      'operator-home',
       'operator-inbound',
       'operator-putaway',
       'operator-stock',
@@ -32,7 +33,7 @@ export const ROLES = {
     badgeClass: 'badge-inbound',
     color: '#f59e0b',
     allowedPortals: ['OPERATOR'],
-    allowedViews: ['operator-inbound', 'operator-stock']
+    allowedViews: ['operator-home', 'operator-inbound', 'operator-stock']
   },
   PUTAWAY: {
     id: 'PUTAWAY',
@@ -40,7 +41,7 @@ export const ROLES = {
     badgeClass: 'badge-putaway',
     color: '#3b82f6',
     allowedPortals: ['OPERATOR'],
-    allowedViews: ['operator-putaway', 'operator-stock']
+    allowedViews: ['operator-home', 'operator-putaway', 'operator-stock']
   },
   CHECKER: {
     id: 'CHECKER',
@@ -48,7 +49,7 @@ export const ROLES = {
     badgeClass: 'badge-checker',
     color: '#10b981',
     allowedPortals: ['ADMIN', 'OPERATOR'],
-    allowedViews: ['admin-stock', 'operator-stock']
+    allowedViews: ['operator-home', 'admin-stock', 'operator-stock']
   },
   SUPERVISOR: {
     id: 'SUPERVISOR',
@@ -56,7 +57,7 @@ export const ROLES = {
     badgeClass: 'badge-supervisor',
     color: '#06b6d4',
     allowedPortals: ['ADMIN', 'OPERATOR'],
-    allowedViews: ['admin-dashboard', 'admin-inbound', 'admin-stock', 'operator-stock']
+    allowedViews: ['operator-home', 'admin-dashboard', 'admin-inbound', 'admin-stock', 'operator-stock']
   }
 };
 
@@ -255,17 +256,14 @@ class AuthManager {
     if (!this.currentUser) return 'login';
     switch (this.currentUser.role) {
       case 'SUPER_ADMIN':
-        return 'admin-dashboard';
-      case 'INBOUND':
-        return 'operator-inbound';
-      case 'PUTAWAY':
-        return 'operator-putaway';
-      case 'CHECKER':
-        return 'admin-stock';
       case 'SUPERVISOR':
         return 'admin-dashboard';
+      case 'CHECKER':
+        return 'admin-stock';
+      case 'INBOUND':
+      case 'PUTAWAY':
       default:
-        return 'operator-inbound';
+        return 'operator-home';
     }
   }
 

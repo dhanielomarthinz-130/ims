@@ -2,12 +2,13 @@
  * Main Application Orchestrator, Router & Auth Guard
  * Dual-Mode Architecture:
  * - ADMIN PORTAL: Desktop Enterprise 2-Column Sidebar & Topbar
- * - OPERATOR PORTAL: Full-screen Handheld Terminal UI (NO SIDEBAR) with Large Touch Navigation
+ * - OPERATOR PORTAL: Native Mobile App Launcher Home Screen (iOS/Android Style, NO SIDEBAR)
  */
 
 import { Auth, ROLES } from './data/auth.js';
 import { Storage } from './data/storage.js';
 import { LoginView } from './components/loginView.js';
+import { OperatorHome } from './components/operatorHome.js';
 import { OperatorInbound } from './components/operatorInbound.js';
 import { OperatorPutaway } from './components/operatorPutaway.js';
 import { OperatorStock } from './components/operatorStock.js';
@@ -387,7 +388,7 @@ class WMSApp {
     if (portal === 'ADMIN') {
       this.currentView = Auth.canAccessView('admin-dashboard') ? 'admin-dashboard' : 'admin-stock';
     } else {
-      this.currentView = Auth.canAccessView('operator-inbound') ? 'operator-inbound' : 'operator-stock';
+      this.currentView = 'operator-home';
     }
 
     this.applyPortalLayout();
@@ -429,130 +430,23 @@ class WMSApp {
       return;
     }
 
-    const user = Auth.getCurrentUser();
-    const roleInfo = ROLES[user.role] || { name: user.role, color: '#94a3b8' };
-
-    // --- OPERATOR HANDHELD PORTAL (NO SIDEBAR) ---
+    // --- OPERATOR HANDHELD PORTAL (NO SIDEBAR, iOS/Android Launcher Architecture) ---
     if (this.currentPortal === 'OPERATOR') {
-      const stagingCount = Storage.getStockItems().filter((s) => s.status === 'STAGING').length;
-      const canAccessAdmin = Auth.canAccessPortal('ADMIN');
-
-      mainContainer.innerHTML = `
-        <div class="handheld-portal-wrapper">
-          
-          <!-- Handheld Topbar -->
-          <div class="handheld-topbar">
-            <div class="handheld-operator-info">
-              <div class="handheld-avatar">${user.avatar || '👷'}</div>
-              <div class="handheld-name-box">
-                <span class="handheld-name">${user.name}</span>
-                <span class="handheld-role-chip" style="color: ${roleInfo.color};">${roleInfo.name}</span>
-              </div>
-            </div>
-
-            <div class="handheld-top-actions">
-              <button class="btn btn-sm btn-primary" id="btn-hht-scan-trigger" title="Buka Scanner Barcode (F2)">
-                <i class="icon-camera"></i> Scan (F2)
-              </button>
-              ${canAccessAdmin ? `
-                <button class="btn btn-sm btn-outline" id="btn-hht-switch-admin" title="Kembali ke Panel Admin">
-                  🖥️ Admin Panel
-                </button>
-              ` : ''}
-              <button class="btn btn-sm btn-danger" id="btn-hht-logout" title="Keluar / Logout">
-                🚪 Logout
-              </button>
-            </div>
-          </div>
-
-          <!-- Handheld Touch Menu Tabs Grid -->
-          <div class="handheld-nav-bar">
-            ${Auth.canAccessView('operator-inbound') ? `
-              <button class="handheld-nav-btn ${this.currentView === 'operator-inbound' ? 'active' : ''}" id="tab-hht-inbound">
-                <span class="handheld-nav-icon">📥</span>
-                <span>Inbound Staging</span>
-              </button>
-            ` : ''}
-
-            ${Auth.canAccessView('operator-putaway') ? `
-              <button class="handheld-nav-btn ${this.currentView === 'operator-putaway' ? 'active' : ''}" id="tab-hht-putaway">
-                <span class="handheld-nav-icon">🚜</span>
-                <span>Putaway Rak</span>
-                ${stagingCount > 0 ? `<span class="handheld-badge">${stagingCount}</span>` : ''}
-              </button>
-            ` : ''}
-
-            ${Auth.canAccessView('operator-stock') ? `
-              <button class="handheld-nav-btn ${this.currentView === 'operator-stock' ? 'active' : ''}" id="tab-hht-stock">
-                <span class="handheld-nav-icon">🔍</span>
-                <span>Cek Stock</span>
-              </button>
-            ` : ''}
-          </div>
-
-          <!-- Active Operator View Body -->
-          <div id="handheld-view-body" class="handheld-view-body"></div>
-        </div>
-      `;
-
-      // Attach Handheld Header & Tab Events
-      const btnScan = mainContainer.querySelector('#btn-hht-scan-trigger');
-      if (btnScan) {
-        btnScan.onclick = () => {
-          QRScanner.openScannerModal({
-            title: 'Handheld Barcode / QR Scanner',
-            hint: 'Arahkan kamera ke QR Barcode Pallet atau Rak',
-            onScan: (code) => {
-              if (this.currentView === 'operator-putaway') {
-                this.navigateTo('operator-putaway', { autoScanLP: code });
-              } else {
-                this.navigateTo('operator-stock');
-              }
-            }
-          });
-        };
-      }
-
-      const btnSwitchAdmin = mainContainer.querySelector('#btn-hht-switch-admin');
-      if (btnSwitchAdmin) {
-        btnSwitchAdmin.onclick = () => this.switchPortal('ADMIN');
-      }
-
-      const btnLogout = mainContainer.querySelector('#btn-hht-logout');
-      if (btnLogout) {
-        btnLogout.onclick = () => {
-          if (confirm(`Logout dari akun ${user.name}?`)) {
-            Auth.logout();
-            SoundEngine.playScanSuccess();
-            this.renderLogin();
-          }
-        };
-      }
-
-      const tabInbound = mainContainer.querySelector('#tab-hht-inbound');
-      if (tabInbound) tabInbound.onclick = () => this.navigateTo('operator-inbound');
-
-      const tabPutaway = mainContainer.querySelector('#tab-hht-putaway');
-      if (tabPutaway) tabPutaway.onclick = () => this.navigateTo('operator-putaway');
-
-      const tabStock = mainContainer.querySelector('#tab-hht-stock');
-      if (tabStock) tabStock.onclick = () => this.navigateTo('operator-stock');
-
-      const hhtBody = mainContainer.querySelector('#handheld-view-body');
-
-      // Render Active Component into Handheld Body
       switch (this.currentView) {
+        case 'operator-home':
+          OperatorHome.render(mainContainer);
+          break;
         case 'operator-inbound':
-          OperatorInbound.render(hhtBody, this.viewParams);
+          OperatorInbound.render(mainContainer, this.viewParams);
           break;
         case 'operator-putaway':
-          OperatorPutaway.render(hhtBody, this.viewParams);
+          OperatorPutaway.render(mainContainer, this.viewParams);
           break;
         case 'operator-stock':
-          OperatorStock.render(hhtBody, this.viewParams);
+          OperatorStock.render(mainContainer, this.viewParams);
           break;
         default:
-          OperatorInbound.render(hhtBody, this.viewParams);
+          OperatorHome.render(mainContainer);
       }
       return;
     }

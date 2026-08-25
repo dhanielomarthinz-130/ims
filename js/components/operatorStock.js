@@ -20,9 +20,14 @@ export const OperatorStock = {
       <div class="hht-view-container">
         <!-- Top Header -->
         <div class="hht-card-header">
-          <div>
-            <span class="hht-badge-step"><i class="icon-search"></i> CEK STOK GUDANG</span>
-            <h2 class="hht-title">Cari & Scan Stok Gudang</h2>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline" id="btn-stock-back-home" title="Kembali ke Menu Utama Handheld">
+              ← Menu
+            </button>
+            <div>
+              <span class="hht-badge-step"><i class="icon-search"></i> CEK STOK GUDANG</span>
+              <h2 class="hht-title">Cari & Scan Stok Gudang</h2>
+            </div>
           </div>
           <button class="btn btn-primary btn-sm" id="btn-scan-stock-search">
             <i class="icon-camera"></i> Scan Barcode
@@ -89,14 +94,21 @@ export const OperatorStock = {
         hint: 'Scan barcode SKU barang atau label lokasi rak untuk melihat stok real-time',
         filterType: 'ALL',
         onScan: (code) => {
-          searchInput.value = code;
           this.activeQuery = code.trim().toLowerCase();
+          searchInput.value = code;
           clearBtn.style.display = 'block';
           SoundEngine.playScanSuccess();
           this.renderStockList(container);
         }
       });
     });
+
+    const btnBackHome = container.querySelector('#btn-stock-back-home');
+    if (btnBackHome) {
+      btnBackHome.addEventListener('click', () => {
+        window.navigateTo('operator-home');
+      });
+    }
 
     // Zone filters
     zoneChips.forEach((chip) => {

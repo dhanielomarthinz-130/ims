@@ -25,9 +25,14 @@ export const OperatorPutaway = {
       <div class="hht-view-container">
         <!-- Top Header -->
         <div class="hht-card-header">
-          <div>
-            <span class="hht-badge-step"><i class="icon-arrow-right-circle"></i> WORKFLOW PUTAWAY</span>
-            <h2 class="hht-title">Putaway Barang ke Rak</h2>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline" id="btn-putaway-back-home" title="Kembali ke Menu Utama Handheld">
+              ← Menu
+            </button>
+            <div>
+              <span class="hht-badge-step"><i class="icon-arrow-right-circle"></i> WORKFLOW PUTAWAY</span>
+              <h2 class="hht-title">Putaway Barang ke Rak</h2>
+            </div>
           </div>
           <span class="badge badge-warning" id="putaway-pending-count">${stagingCount} Menunggu</span>
         </div>
@@ -103,6 +108,13 @@ export const OperatorPutaway = {
             this.processScannedLP(code, container);
           }
         });
+      });
+    }
+
+    const btnBackHome = container.querySelector('#btn-putaway-back-home');
+    if (btnBackHome) {
+      btnBackHome.addEventListener('click', () => {
+        window.navigateTo('operator-home');
       });
     }
   },

@@ -25,9 +25,14 @@ export const OperatorInbound = {
       <div class="hht-view-container">
         <!-- HHT Header / Topbar -->
         <div class="hht-card-header">
-          <div>
-            <span class="hht-badge-step">PINTU PENERIMAAN / STAGING</span>
-            <h2 class="hht-title">Inbound Staging Baru</h2>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline" id="btn-inbound-back-home" title="Kembali ke Menu Utama Handheld">
+              ← Menu
+            </button>
+            <div>
+              <span class="hht-badge-step">PINTU PENERIMAAN / STAGING</span>
+              <h2 class="hht-title">Inbound Staging Baru</h2>
+            </div>
           </div>
           <button class="btn btn-sm btn-ghost" id="btn-reset-inbound-form" title="Bersihkan Form">
             <i class="icon-refresh"></i> Reset
@@ -224,6 +229,14 @@ export const OperatorInbound = {
     container.querySelector('#btn-reset-inbound-form').addEventListener('click', () => {
       form.reset();
     });
+
+    // Back to Menu Utama button
+    const btnBackHome = container.querySelector('#btn-inbound-back-home');
+    if (btnBackHome) {
+      btnBackHome.addEventListener('click', () => {
+        window.navigateTo('operator-home');
+      });
+    }
   },
 
   renderStagingMiniList: function (container) {
