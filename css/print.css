@@ -1,0 +1,344 @@
+/* ==========================================================================
+   WMS Print Stylesheet
+   Optimized for:
+   1. Thermal Label Printers (100x75mm & 50x30mm)
+   2. Standard A4 Goods Receipt Note Documents
+   3. Rack Barcode Sticker Sheets
+   ========================================================================== */
+
+/* Preview styling on screen (Dark Theme UI) */
+.printable-label-wrapper {
+  background: #ffffff;
+  color: #000000;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  margin: 0 auto;
+  max-width: 420px;
+}
+
+.thermal-label {
+  border: 2px solid #000000;
+  padding: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: #000000;
+}
+
+.label-brand {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid #000000;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.brand-title {
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+}
+
+.label-doc {
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.label-main-grid {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.label-qr-box {
+  text-align: center;
+}
+
+.label-qr-img {
+  width: 120px;
+  height: 120px;
+  display: block;
+  margin: 0 auto;
+}
+
+.label-lpid {
+  display: block;
+  font-family: monospace;
+  font-weight: 800;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.label-item-name {
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  color: #000000;
+}
+
+.label-sku {
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.label-details-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  background: #f1f5f9;
+  padding: 4px;
+  border: 1px solid #cbd5e1;
+  margin-bottom: 6px;
+}
+
+.lbl-small {
+  display: block;
+  font-size: 8px;
+  color: #475569;
+}
+
+.lbl-val {
+  font-size: 11px;
+  color: #000000;
+}
+
+.label-qty-row {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.lbl-qty {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.label-loc-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  border-top: 1px dashed #94a3b8;
+  padding-top: 4px;
+}
+
+.label-barcode-footer {
+  margin-top: 8px;
+  text-align: center;
+  border-top: 1px solid #000000;
+  padding-top: 4px;
+}
+
+.label-barcode-img {
+  max-width: 90%;
+  height: 40px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Printable A4 Paper Preview */
+.a4-document-paper {
+  background: #ffffff;
+  color: #000000;
+  padding: 2.5rem;
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.doc-header-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.doc-company-info h2 {
+  font-size: 18px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.doc-company-info p {
+  color: #475569;
+  font-size: 11px;
+}
+
+.doc-qr-stamp {
+  text-align: center;
+}
+
+.doc-qr-img {
+  width: 90px;
+  height: 90px;
+}
+
+.doc-stamp-label {
+  display: block;
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.doc-divider {
+  height: 2px;
+  background: #0f172a;
+  margin: 12px 0 16px;
+}
+
+.doc-report-title {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.doc-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.doc-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+}
+
+.doc-items-table th, .doc-items-table td {
+  border: 1px solid #cbd5e1;
+  padding: 8px;
+  font-size: 11px;
+}
+
+.doc-items-table th {
+  background: #f1f5f9;
+  font-weight: bold;
+}
+
+.doc-signatures-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  text-align: center;
+  margin-top: 32px;
+}
+
+.sig-line {
+  height: 50px;
+}
+
+/* Rack Stickers Grid */
+.rack-stickers-sheet {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.rack-sticker-card {
+  border: 2px solid #000000;
+  padding: 8px;
+  background: #ffffff;
+  color: #000000;
+  text-align: center;
+}
+
+.sticker-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  font-weight: bold;
+  border-bottom: 1px solid #000000;
+  padding-bottom: 2px;
+  margin-bottom: 4px;
+}
+
+.sticker-qr-img {
+  width: 90px;
+  height: 90px;
+  margin: 4px auto;
+  display: block;
+}
+
+.sticker-big-id {
+  font-family: monospace;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.sticker-name {
+  font-size: 10px;
+  color: #475569;
+}
+
+.sticker-footer {
+  border-top: 1px dashed #000000;
+  margin-top: 4px;
+  padding-top: 2px;
+  font-size: 8px;
+}
+
+/* ==========================================================================
+   ACTUAL @media print RULES
+   ========================================================================== */
+@media print {
+  /* Hide all UI shell, buttons, headers, and backgrounds */
+  body, html {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .app-header,
+  .app-nav,
+  .modal-header,
+  .modal-footer,
+  .btn,
+  .filter-control-card,
+  .print-instruction-box,
+  .admin-page-header {
+    display: none !important;
+  }
+
+  .modal-overlay {
+    position: static !important;
+    background: none !important;
+    padding: 0 !important;
+  }
+
+  .modal-card {
+    border: none !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .printable-label-wrapper {
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .a4-document-paper {
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+}
