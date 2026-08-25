@@ -2927,4 +2927,451 @@ html, body {
   margin-top: 1rem;
 }
 
+/* ==========================================================================
+   IMS Mobile Exact Design Layout (Light Iridescent Background & Squircle Icons)
+   ========================================================================== */
+.ims-mobile-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(180deg, #dbeafe 0%, #e0e7ff 18%, #f8fafc 45%, #ecfeff 85%, #f1f5f9 100%);
+  display: flex;
+  justify-content: center;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.ims-mobile-content {
+  width: 100%;
+  max-width: 480px;
+  padding: 1.25rem 1.25rem 6.5rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 1. Topbar App Bar */
+.ims-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.ims-brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 999px;
+  padding: 6px 14px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.ims-logo-box {
+  background: #0284c7;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 5px;
+  letter-spacing: 0.05em;
+}
+
+.ims-brand-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.04em;
+}
+
+.ims-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ims-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #334155;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.ims-icon-btn:active {
+  transform: scale(0.92);
+}
+
+.ims-user-avatar-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.ims-user-avatar-circle:active {
+  transform: scale(0.92);
+}
+
+/* 2. Greeting & User Section */
+.ims-greeting-section {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.25rem;
+}
+
+.ims-greeting-sub {
+  font-size: 15px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.ims-user-fullname {
+  font-size: 32px;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0 0 10px 0;
+}
+
+.ims-division-badge {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(203, 213, 225, 0.6);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #334155;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.ims-division-badge svg {
+  color: #64748b;
+}
+
+/* 3. Floating 4-Column White Summary Card */
+.ims-summary-card {
+  background: #ffffff;
+  border-radius: 26px;
+  padding: 16px 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  margin-bottom: 2rem;
+}
+
+.ims-stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 6px;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.ims-stat-box:active {
+  transform: scale(0.94);
+}
+
+.box-putaway {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.box-staging {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.box-stockout {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.box-transfer {
+  background: #faf5ff;
+  color: #a855f7;
+}
+
+.stat-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.stat-number {
+  font-size: 22px;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1;
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  text-align: center;
+}
+
+/* 4. Section Heading */
+.ims-section-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+}
+
+/* 5. 4-Column Squircle App Launcher Grid */
+.ims-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px 10px;
+  margin-bottom: 2.5rem;
+}
+
+.ims-menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.ims-menu-item:active {
+  transform: scale(0.92);
+}
+
+.ims-squircle-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.14);
+  position: relative;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.ims-menu-item:hover .ims-squircle-icon {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
+}
+
+/* Vibrant App Gradients */
+.grad-purple {
+  background: linear-gradient(135deg, #a855f7 0%, #d946ef 100%);
+}
+
+.grad-orange {
+  background: linear-gradient(135deg, #f97316 0%, #facc15 100%);
+}
+
+.grad-teal {
+  background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+}
+
+.grad-coral {
+  background: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
+}
+
+.grad-magenta {
+  background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+}
+
+.grad-peach {
+  background: linear-gradient(135deg, #fb923c 0%, #f59e0b 100%);
+}
+
+.grad-cyan {
+  background: linear-gradient(135deg, #06b6d4 0%, #38bdf8 100%);
+}
+
+.grad-emerald {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.grad-coral-soft {
+  background: linear-gradient(135deg, #f87171 0%, #fb923c 100%);
+}
+
+.ims-icon-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+}
+
+.ims-menu-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-top: 8px;
+  line-height: 1.25;
+  text-align: center;
+  word-break: break-word;
+}
+
+/* 6. Footer Section */
+.ims-footer-section {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.ims-footer-version {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.05em;
+}
+
+.ims-footer-copyright {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* 7. Floating Bottom Navigation Bar */
+.ims-bottom-navbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  height: 72px;
+  background: #ffffff;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  padding: 0 20px;
+}
+
+.ims-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+  padding: 6px 16px;
+}
+
+.ims-nav-item:active {
+  transform: scale(0.92);
+}
+
+.ims-nav-item.active {
+  color: #0284c7;
+}
+
+.ims-fab-container {
+  position: relative;
+  top: -20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ims-fab-button {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: #0f172a;
+  border: 4px solid #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ims-fab-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.45);
+}
+
+.ims-fab-button:active {
+  transform: scale(0.92);
+}
+
+.ims-fab-inner {
+  background: #ffffff;
+  padding: 3px 7px;
+  border-radius: 6px;
+}
+
+.ims-fab-text {
+  font-size: 11px;
+  font-weight: 900;
+  color: #0284c7;
+  letter-spacing: 0.05em;
+}
+
+
 
