@@ -5,7 +5,6 @@
 
 import { Auth, ROLES } from './data/auth.js';
 import { Storage } from './data/storage.js';
-import { SupabaseClient } from './data/supabaseClient.js';
 import { LoginView } from './components/loginView.js';
 import { OperatorInbound } from './components/operatorInbound.js';
 import { OperatorPutaway } from './components/operatorPutaway.js';
@@ -104,14 +103,11 @@ class WMSApp {
       sidebarBackdrop.onclick = () => this.toggleMobileDrawer(false);
     }
 
-    // Supabase config modal button
-    const btnSupabase = document.getElementById('btn-supabase-status');
-    if (btnSupabase) {
-      btnSupabase.onclick = () => {
-        SupabaseClient.openConfigModal(() => {
-          this.updateDatabaseStatus();
-          this.renderCurrentView();
-        });
+    // Database status pill click
+    const btnDatabase = document.getElementById('btn-supabase-status');
+    if (btnDatabase) {
+      btnDatabase.onclick = () => {
+        alert('Status Database: Terhubung ke MySQL Database (wms_inventory) di XAMPP localhost:3306.\nSemua data tersimpan secara persisten.');
       };
     }
 
