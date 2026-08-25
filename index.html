@@ -139,50 +139,5 @@
   <!-- Main ES6 Modules Entry Point -->
   <script type="module" src="js/app.js"></script>
 
-  <!-- Global Header Buttons & Scanner Attachment -->
-  <script type="module">
-    import { QRScanner } from './js/components/qrScanner.js';
-    import { Storage } from './js/data/storage.js';
-    import { Auth } from './js/data/auth.js';
-    import { SupabaseClient } from './js/data/supabaseClient.js';
-
-    document.getElementById('btn-supabase-status').addEventListener('click', () => {
-      SupabaseClient.openConfigModal(() => {
-        if (window.wmsApp) {
-          window.wmsApp.updateDatabaseStatus();
-          window.wmsApp.renderCurrentView();
-        }
-      });
-    });
-
-    document.getElementById('btn-quick-scanner').addEventListener('click', () => {
-      if (!Auth.isLoggedIn()) {
-        alert('Silakan login terlebih dahulu untuk menggunakan scanner.');
-        return;
-      }
-      QRScanner.openScannerModal({
-        title: 'Universal Barcode / QR Scanner',
-        hint: 'Scan barang di Staging atau Rak Gudang',
-        onScan: (code) => {
-          if (window.wmsApp && window.wmsApp.currentView === 'operator-putaway') {
-            window.navigateTo('operator-putaway', { autoScanLP: code });
-          } else {
-            window.navigateTo('operator-stock');
-          }
-        }
-      });
-    });
-
-    document.getElementById('btn-reset-database').addEventListener('click', () => {
-      if (confirm('Apakah Anda yakin ingin mereset seluruh data inventori ke data demo awal?')) {
-        Storage.resetToDefaults();
-        alert('Data berhasil direset ke kondisi awal!');
-        if (window.wmsApp) {
-          window.wmsApp.renderCurrentView();
-        }
-      }
-    });
-  </script>
-
 </body>
 </html>

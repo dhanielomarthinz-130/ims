@@ -34,6 +34,7 @@ class WMSApp {
     // Check authentication
     if (!Auth.isLoggedIn()) {
       this.renderLogin();
+      this.attachGlobalEvents();
       return;
     }
 
@@ -101,6 +102,52 @@ class WMSApp {
     }
     if (sidebarBackdrop) {
       sidebarBackdrop.onclick = () => this.toggleMobileDrawer(false);
+    }
+
+    // Supabase config modal button
+    const btnSupabase = document.getElementById('btn-supabase-status');
+    if (btnSupabase) {
+      btnSupabase.onclick = () => {
+        SupabaseClient.openConfigModal(() => {
+          this.updateDatabaseStatus();
+          this.renderCurrentView();
+        });
+      };
+    }
+
+    // Quick Scanner Topbar button
+    const btnQuickScanner = document.getElementById('btn-quick-scanner');
+    if (btnQuickScanner) {
+      btnQuickScanner.onclick = () => {
+        if (!Auth.isLoggedIn()) {
+          alert('Silakan login terlebih dahulu untuk menggunakan scanner.');
+          return;
+        }
+        QRScanner.openScannerModal({
+          title: 'Universal Barcode / QR Scanner',
+          hint: 'Scan barang di Staging atau Rak Gudang',
+          onScan: (code) => {
+            if (this.currentView === 'operator-putaway') {
+              window.navigateTo('operator-putaway', { autoScanLP: code });
+            } else {
+              window.navigateTo('operator-stock');
+            }
+          }
+        });
+      };
+    }
+
+    // Reset database button
+    const btnReset = document.getElementById('btn-reset-database');
+    if (btnReset) {
+      btnReset.onclick = () => {
+        if (confirm('Apakah Anda yakin ingin mereset seluruh data inventori ke data demo awal?')) {
+          Storage.resetToDefaults();
+          SoundEngine.playScanSuccess();
+          alert('Data inventori berhasil direset ke kondisi demo awal!');
+          this.renderCurrentView();
+        }
+      };
     }
   }
 
@@ -461,7 +508,19 @@ class WMSApp {
   }
 }
 
-// Initialize Application when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  window.wmsApp = new WMSApp();
-});
+// Robust bootstrap initialization
+function bootWMS() {
+  if (!window.wmsApp) {
+    try {
+      window.wmsApp = new WMSApp();
+    } catch (err) {
+      console.error('Error booting WMS Application:', err);
+    }
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootWMS);
+} else {
+  bootWMS();
+}
