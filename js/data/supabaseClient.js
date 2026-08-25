@@ -4,6 +4,7 @@
  */
 
 const STORAGE_KEY_SUPABASE = 'wms_supabase_config_v1';
+const DEFAULT_SUPABASE_URL = 'https://iojseetkcyizshyrwlie.supabase.co';
 
 class SupabaseManager {
   constructor() {
@@ -16,23 +17,32 @@ class SupabaseManager {
     const raw = localStorage.getItem(STORAGE_KEY_SUPABASE);
     if (raw) {
       try {
-        return JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        return {
+          url: parsed.url || DEFAULT_SUPABASE_URL,
+          key: parsed.key || '',
+          isEnabled: parsed.isEnabled || false
+        };
       } catch (e) {
-        return { url: '', key: '', isEnabled: false };
+        return { url: DEFAULT_SUPABASE_URL, key: '', isEnabled: false };
       }
     }
     return {
-      url: window.ENV_SUPABASE_URL || '',
+      url: window.ENV_SUPABASE_URL || DEFAULT_SUPABASE_URL,
       key: window.ENV_SUPABASE_ANON_KEY || '',
       isEnabled: false
     };
   }
 
   saveConfig(url, key, isEnabled = true) {
+    let cleanUrl = (url || DEFAULT_SUPABASE_URL).trim();
+    // Remove trailing /rest/v1/ or / if present
+    cleanUrl = cleanUrl.replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
+
     this.config = {
-      url: (url || '').trim(),
+      url: cleanUrl,
       key: (key || '').trim(),
-      isEnabled: isEnabled && !!url && !!key
+      isEnabled: isEnabled && !!cleanUrl && !!key
     };
     localStorage.setItem(STORAGE_KEY_SUPABASE, JSON.stringify(this.config));
     this.init();
@@ -56,7 +66,7 @@ class SupabaseManager {
   }
 
   async testConnection() {
-    if (!this.client) return { success: false, message: 'Klien Supabase belum diinisialisasi.' };
+    if (!this.client) return { success: false, message: 'Klien Supabase belum diinisialisasi atau API Key belum diisi.' };
     try {
       const { data, error } = await this.client.from('products').select('sku').limit(1);
       if (error) throw error;
@@ -156,7 +166,7 @@ class SupabaseManager {
 
         <div class="modal-body">
           <p class="section-subtext">
-            Hubungkan WMS Anda ke database cloud Supabase gratis. Masukkan <strong>Project URL</strong> dan <strong>Anon Public Key</strong> dari dashboard Supabase Anda.
+            Project URL Supabase Anda telah disetel ke <code>https://iojseetkcyizshyrwlie.supabase.co</code>. Silakan masukkan <strong>Anon Public API Key</strong> Anda untuk menyelesaikan koneksi.
           </p>
 
           <div class="form-group">
@@ -165,13 +175,13 @@ class SupabaseManager {
               type="text"
               id="supa-url-input"
               class="hht-input font-mono"
-              placeholder="https://xxxxxxxx.supabase.co"
-              value="${this.config.url || ''}"
+              placeholder="https://iojseetkcyizshyrwlie.supabase.co"
+              value="${this.config.url || DEFAULT_SUPABASE_URL}"
             />
           </div>
 
           <div class="form-group">
-            <label>Supabase Anon Public API Key</label>
+            <label>Supabase Anon Public API Key (anon public key)</label>
             <textarea
               id="supa-key-input"
               class="hht-input font-mono"
@@ -182,7 +192,7 @@ class SupabaseManager {
 
           <div class="form-group">
             <label class="radio-label">
-              <input type="checkbox" id="supa-enable-toggle" ${this.config.isEnabled ? 'checked' : ''} />
+              <input type="checkbox" id="supa-enable-toggle" ${this.config.isEnabled ? 'checked' : 'checked'} />
               <span>Aktifkan Sinkronisasi Cloud Supabase Realtime</span>
             </label>
           </div>
@@ -190,11 +200,11 @@ class SupabaseManager {
           <div id="supa-test-result" style="display: none; margin-top: 0.75rem;"></div>
 
           <div class="cloud-info-box mt-3" style="background: rgba(16,185,129,0.08); border: 1px solid #10b981; border-radius: 8px; padding: 10px; font-size: 0.8rem;">
-            <strong>💡 Panduan Cepat Setup Supabase:</strong>
+            <strong>💡 Cara Mendapatkan Anon API Key:</strong>
             <ol style="margin-left: 1.25rem; margin-top: 4px;">
-              <li>Buat project baru di <a href="https://supabase.com" target="_blank" style="color: #38bdf8;">supabase.com</a></li>
-              <li>Buka menu <strong>SQL Editor</strong> $\rightarrow$ jalankan file <code>supabase_schema.sql</code></li>
-              <li>Buka <strong>Project Settings $\rightarrow$ API</strong> $\rightarrow$ salin URL dan anon key ke form ini.</li>
+              <li>Di dashboard Supabase Anda, buka menu <strong>Project Settings</strong> (ikon gerigi ⚙️ di kiri bawah) $\rightarrow$ pilih <strong>Data API</strong>.</li>
+              <li>Di bawah tulisan <strong>Project API keys</strong>, klik tombol <em>Copy</em> pada baris <strong>`anon` `public`</strong>.</li>
+              <li>Tempelkan (Paste) key tersebut ke kotak di atas, lalu klik <strong>Test Koneksi</strong> $\rightarrow$ <strong>Simpan Konfigurasi</strong>.</li>
             </ol>
           </div>
         </div>
@@ -222,11 +232,12 @@ class SupabaseManager {
 
     // Test connection button
     modal.querySelector('#btn-test-supa-conn').addEventListener('click', async () => {
-      const testUrl = urlInp.value.trim();
+      let testUrl = urlInp.value.trim() || DEFAULT_SUPABASE_URL;
+      testUrl = testUrl.replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
       const testKey = keyInp.value.trim();
 
-      if (!testUrl || !testKey) {
-        alert('Silakan masukkan Supabase URL dan Key terlebih dahulu.');
+      if (!testKey) {
+        alert('Silakan masukkan Supabase Anon API Key terlebih dahulu.');
         return;
       }
 
@@ -239,16 +250,16 @@ class SupabaseManager {
           const { data, error } = await testClient.from('products').select('sku').limit(1);
           if (error) throw error;
 
-          resultBox.innerHTML = `<div class="badge badge-success" style="padding: 6px 10px; width: 100%;">✓ Koneksi Berhasil! Database Supabase siap digunakan.</div>`;
+          resultBox.innerHTML = `<div class="badge badge-success" style="padding: 8px 12px; width: 100%;"><i class="icon-check"></i> Koneksi Berhasil! Database Supabase (iojseetkcyizshyrwlie) siap digunakan.</div>`;
         } catch (err) {
-          resultBox.innerHTML = `<div class="badge badge-danger" style="padding: 6px 10px; width: 100%;">✕ Koneksi Gagal: ${err.message}</div>`;
+          resultBox.innerHTML = `<div class="badge badge-danger" style="padding: 8px 12px; width: 100%;"><i class="icon-x"></i> Koneksi Gagal: ${err.message}</div>`;
         }
       }
     });
 
     // Save config
     modal.querySelector('#btn-save-supa-config').addEventListener('click', () => {
-      const url = urlInp.value.trim();
+      const url = urlInp.value.trim() || DEFAULT_SUPABASE_URL;
       const key = keyInp.value.trim();
       const isEnabled = enableToggle.checked;
 
