@@ -2083,3 +2083,273 @@ html, body {
     flex: 1;
   }
 }
+
+/* ==========================================================================
+   Universal Scanner Modal & Camera Overlay Styles
+   ========================================================================== */
+.scanner-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.scanner-modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  max-width: 580px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+.scanner-header {
+  padding: 1.15rem 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.scanner-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.scanner-icon-pulse {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: var(--primary-subtle);
+  border: 1px solid var(--primary-border);
+  color: #60a5fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.scanner-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.btn-close-scanner {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.btn-close-scanner:hover {
+  color: #ffffff;
+}
+
+.scanner-tabs {
+  display: flex;
+  background: var(--bg-card-inner);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 1rem;
+  gap: 0.5rem;
+}
+
+.scanner-tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.75rem 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.scanner-tab:hover {
+  color: var(--text-white);
+}
+
+.scanner-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.scanner-tab-body {
+  display: none;
+  padding: 1.25rem 1.5rem;
+}
+
+.scanner-tab-body.active {
+  display: block;
+}
+
+.section-subtext {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.85rem;
+}
+
+.quick-scan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.quick-scan-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--bg-card-inner);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.quick-scan-card:hover {
+  background: var(--bg-sidebar-hover);
+  border-color: var(--border-focus);
+}
+
+.quick-scan-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.quick-scan-code {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-white);
+}
+
+.quick-scan-name {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scan-arrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #60a5fa;
+}
+
+.manual-scan-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.input-with-action {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-with-action input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-white);
+  padding: 0.65rem 0.85rem;
+  font-size: 0.95rem;
+  font-family: var(--font-mono);
+  outline: none;
+}
+
+.input-with-action input:focus {
+  border-color: var(--border-focus);
+}
+
+.input-tip {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.camera-viewport-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #000000;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+#scanner-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.laser-scanner-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.laser-line {
+  width: 80%;
+  height: 2px;
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  animation: laserScan 2s ease-in-out infinite;
+}
+
+@keyframes laserScan {
+  0%, 100% { transform: translateY(-70px); }
+  50% { transform: translateY(70px); }
+}
+
+.target-corners {
+  position: absolute;
+  width: 70%;
+  height: 60%;
+  border: 1px dashed rgba(255, 255, 255, 0.4);
+}
+
+.camera-controls {
+  text-align: center;
+}
+
+.camera-status-text {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
